@@ -64,7 +64,12 @@ class ShopController extends Controller
 
     public function cart()
     {
+        $session_id = CommonTrait::session_id();
+
+        $rows = TempOrder::whereSessionId($session_id)->get();
+
         $data['title'] = 'Cart - '.env('APP_NAME');
+        $data['rows'] = $rows;
 
         return view('cart', $data);
     }
@@ -113,4 +118,17 @@ class ShopController extends Controller
             'message' => "Product added in Cart"
         ]);
     }
+
+    public function ajax_remove_cart_item(Request $request, $item_id)
+    {
+        $session_id = CommonTrait::session_id();
+        TempOrder::whereSessionId($session_id)->whereId($item_id)->delete();
+
+        return response()->json([
+            'result' => true,
+            'cart_quantity' => TempOrder::whereSessionId($session_id)->get()->sum('quantity'),
+            'message' => "Product removed from Cart"
+        ]);
+    }
+    
 }
