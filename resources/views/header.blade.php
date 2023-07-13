@@ -14,6 +14,13 @@
             <div class="text-end">
                 <a href="{{ route('cart') }}" class="d-block link-body-emphasis text-decoration-none">
                     Cart
+                    <span class="cart-quantity">
+                        @if (App\Models\TempOrder::whereSessionId(Session::get('session_id'))->count() > 0)
+                            ({{ App\Models\TempOrder::whereSessionId(Session::get('session_id'))->get()->sum('quantity') }})
+                        @else
+                        (0)
+                        @endif
+                    </span>
                 </a>
             </div>
         </div>

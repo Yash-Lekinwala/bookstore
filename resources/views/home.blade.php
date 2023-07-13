@@ -5,7 +5,7 @@
             <div class="container">
 
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-                    @foreach ($products as $product)
+                    {{-- @foreach ($products as $product)
                         <div class="col">
                             <div class="card shadow-sm">
                                 <img src="{{asset('storage/books/'.$product->photo)}}" alt="" class="img-fluid w-50 rounded mx-auto" />
@@ -16,10 +16,19 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @endforeach --}}
                 </div>
             </div>
         </div>
 
     </main>
+@endsection
+
+
+@section('extra-js')
+    <script>
+        $(document).ready(function() {
+            call_ajax_products();
+        });
+    </script>
 @endsection
