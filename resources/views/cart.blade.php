@@ -78,7 +78,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-success">
+                                    <a href="{{route('checkout')}}" class="btn btn-success">
                                         Checkout <span class="fa fa-play"></span>
                                     </a>
                                 </td>

@@ -17,27 +17,27 @@
                         Author: {{ $product_data->author }}
                     </div>
                     <div class="text-bold">
-                        Stock: {{ $product_data->quantity ?? 'No Stock' }}
+                        Stock: {{ $product_data->quantity > 0 ? $product_data->quantity : 'No Stock' }}
                     </div>
-
 
                     <div class="price-area my-4">
                         <p class="new-price text-bold mb-1">{{ '₹' . $product_data->price }}</p>
-
                     </div>
 
 
-                    <div class="buttons d-flex my-5">
+                    @if ($product_data->quantity > 0)
+                        <div class="buttons d-flex my-5">
 
-                        <div class="block quantity">
-                            <input type="number" class="form-control" id="cart_quantity" value="1" min="0"
-                                max="{{ $product_data->quantity }}" name="cart_quantity">
+                            <div class="block quantity">
+                                <input type="number" class="form-control" id="cart_quantity" value="1" min="0"
+                                    max="{{ $product_data->quantity }}" name="cart_quantity">
+                            </div>
+                            <div class="block ms-3">
+                                <button class="btn btn-primary add-to-cart" data-id="{{ $product_data->long_id }}">Add to
+                                    cart</button>
+                            </div>
                         </div>
-                        <div class="block ms-3">
-                            <button class="btn btn-primary add-to-cart" data-id="{{ $product_data->long_id }}">Add to
-                                cart</button>
-                        </div>
-                    </div>
+                    @endif
 
                 </div>
 
@@ -61,7 +61,7 @@
                 data: formData,
                 dataType: "json",
                 success: function(response) {
-                    $('.cart-quantity').html('('+response.cart_quantity+')')
+                    $('.cart-quantity').html('(' + response.cart_quantity + ')')
                     Toastify({
                         text: response.message,
                         duration: 3000,

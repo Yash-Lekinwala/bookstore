@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TempOrder extends Model
+class Order extends Model
 {
     use HasFactory;
 
-    public function product_data()
+    public function order_details()
     {
-        return $this->hasOne(Product::class, 'id', 'product_id');
+        return $this->hasOne(OrderDetail::class, 'order_id');
     }
 }

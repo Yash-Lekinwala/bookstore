@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\TempOrder;
 use App\Http\Traits\CommonTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use stdClass;
 
 class ShopController extends Controller
 {
@@ -82,6 +87,7 @@ class ShopController extends Controller
         $quantity = $request->input('quantity');
 
         $product = Product::whereLongId($product_long_id)->first();
+        
         if(!$product)
         {
             return response()->json([
@@ -131,4 +137,79 @@ class ShopController extends Controller
         ]);
     }
     
+    public function checkout()
+    {
+        if(TempOrder::whereSessionId(Session::get('session_id'))->count() == 0)
+        return redirect()->route('home');
+
+        $session_id = CommonTrait::session_id();
+        $rows = TempOrder::whereSessionId($session_id)->get();
+        $total_qty = TempOrder::whereSessionId($session_id)->get()->sum('quantity');
+
+        $data['title'] = 'Checkout - '.env('APP_NAME');
+        $data['rows'] = $rows;
+        $data['total_qty'] = $total_qty;
+
+        return view('checkout', $data);
+    }
+
+    public function place_order(Request $request)
+    {
+        $session_id = CommonTrait::session_id();
+        $rows = TempOrder::whereSessionId($session_id)->get();
+
+        $long_order_id = Str::random(12);
+
+        $order = new Order;
+        $order->long_id = $long_order_id;
+        $order->first_name = $request->input('first_name');
+        $order->last_name = $request->input('last_name');
+        $order->email = $request->input('email');
+        $order->address = $request->input('address');
+        $order->country = $request->input('country');
+        $order->state = $request->input('state');
+        $order->city = $request->input('city');
+        $order->total_amount = 0;
+        $order->save();
+
+        $order_id = $order->id;
+
+        $sub_total = 0;
+
+        foreach($rows AS $row)
+        {
+            // $product = WebShopProductPropertyOption::find($row->option_id);
+            // $quantity = $row->quantity;
+
+            if($row->quantity > $row->product_data->quantity)
+                continue;
+
+            $order_detail = new OrderDetail;
+            $order_detail->order_id = $order_id;
+            $order_detail->product_id = $row->product_data->id;
+            $order_detail->title = $row->product_data->title;
+            $order_detail->price = $row->product_data->price;
+            $order_detail->quantity = $row->quantity;
+            $order_detail->sub_total = $row->quantity*$row->product_data->price;
+            $tmp_sub_total = $order_detail->sub_total;
+
+            $order_detail->save();
+
+            $remaining_qty = $row->product_data->quantity - $row->quantity;
+            Product::where('id', $order_detail->product_id)->update(['quantity' => $remaining_qty]);
+
+            $sub_total += $tmp_sub_total;
+        }
+
+        $order->total_amount = $sub_total;
+        $order->save();
+
+        TempOrder::whereSessionId($session_id)->delete();
+
+        return response()->json([
+            'result' => true,
+            'message' => 'order Placed successfully',
+        ]);
+
+    }
 }
