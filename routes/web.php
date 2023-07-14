@@ -14,10 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 Route::get('/', [ShopController::class, 'home'])->name('home');
 Route::get('/ajax-get-products', [ShopController::class, 'ajax_get_products'])->name('ajax-get-products');
 Route::get('/cart', [ShopController::class, 'cart'])->name('cart');
@@ -26,3 +22,4 @@ Route::post('/add-to-cart', [ShopController::class, 'ajax_add_to_cart'])->name('
 Route::post('/remove-cart-item/{id}', [ShopController::class, 'ajax_remove_cart_item'])->name('remove-cart-item');
 Route::get('/checkout', [ShopController::class, 'checkout'])->name('checkout');
 Route::post('/place-order', [ShopController::class, 'place_order'])->name('place-order');
+Route::get('/orders', [ShopController::class, 'orders'])->name('orders');

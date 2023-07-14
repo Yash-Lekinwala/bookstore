@@ -178,9 +178,6 @@ class ShopController extends Controller
 
         foreach($rows AS $row)
         {
-            // $product = WebShopProductPropertyOption::find($row->option_id);
-            // $quantity = $row->quantity;
-
             if($row->quantity > $row->product_data->quantity)
                 continue;
 
@@ -210,6 +207,15 @@ class ShopController extends Controller
             'result' => true,
             'message' => 'order Placed successfully',
         ]);
+    }
 
+    public function orders()
+    {
+        $orders = Order::all();
+
+        $data['title'] = 'Orders - '.env('APP_NAME');
+        $data['orders'] = $orders;
+        
+        return view('orders', $data);
     }
 }
